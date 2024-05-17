@@ -1,35 +1,25 @@
 <template>
   <div class="notes">
-    <div class="card has-background-success-dark p-4 mb-5">
-      <div class="field">
-        <div class="control">
-          <textarea
-            v-model="newNote"
-            class="textarea"
-            placeholder="Add a new note"
-            ref="newNoteRef"
-          />
-        </div>
-      </div>
-
-      <div class="field is-grouped is-grouped-right">
-        <div class="control">
-          <button
+    <AddEditNote
+      v-model="newNote"
+      ref="addEditNoteRef"
+      placeholder="Add a new Note"
+    >
+      <template #buttons>
+        <button
             @click="addNote"
             :disabled="!newNote"
             class="button is-link has-background-success"
           >
             Add New Note
           </button>
-        </div>
-      </div>
-    </div>
+      </template>
+    </AddEditNote> 
 
     <Note
-      v-for="note in notes"
+      v-for="note in storeNotes.notes"
       :key="note.id"
       :note="note"
-      @deleteClicked="deleteNote"
     />
   </div>
 </template>
@@ -41,47 +31,29 @@
 
 import { ref } from 'vue'
 import Note from '@/components/Notes/Note.vue'
+import { useStoreNotes } from '@/stores/storeNotes';
+import AddEditNote from '@/components/Notes/AddEditNote.vue';
+
+/* 
+  store
+*/
+  const storeNotes = useStoreNotes()
 
 /*
   notes
 */
 
 const newNote = ref('')
+const addEditNoteRef = ref(null)
 const newNoteRef = ref(null)
 
-const notes = ref([
-  {
-    id: 'id1',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec'
-  },
-  {
-    id: 'id2',
-    content: 'This is a shorter, notes!'
-  }
-])
 
 /*
   add new note
 */
   const addNote = () => {
-    let currentDate = new Date().getTime(),
-        id = currentDate.toString()
-
-    let note = {
-      id: id,
-      content: newNote.value
-    }
-
-    notes.value.unshift(note)
+    storeNotes.addNote(newNote.value)
     newNote.value = ''
-    newNoteRef.value.focus()
+    addEditNoteRef.value.focusTextarea()
   }
-
-/*
-  delete note
-*/
-  const deleteNote = id => {
-    notes.value = notes.value.filter(note => note.id !== id)
-  }
-
 </script>
