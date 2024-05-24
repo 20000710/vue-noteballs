@@ -60,7 +60,6 @@ import { ref } from 'vue';
   mobile nav
 */
   const showMobileNav = ref(false);
-  const navbarBurgerRef = ref(false);
 
 /*  
   click outside to close
