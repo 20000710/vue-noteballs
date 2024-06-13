@@ -10,7 +10,22 @@
   imports
 */
 
-import Navbar from '@/components/Layout/Navbar.vue';
+  import Navbar from '@/components/Layout/Navbar.vue';
+  import { useStoreNotes } from '@/stores/storeNotes';
+import { onMounted } from 'vue';
+
+/*
+  store
+*/
+  const stoerNotes = useStoreNotes()
+
+/*
+  mounted
+*/
+
+  onMounted(() => {
+    stoerNotes.getNotes()
+  })
 </script>
 
 <style>
