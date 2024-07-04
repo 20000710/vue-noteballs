@@ -9,8 +9,22 @@
 /*
   imports
 */
+  import Navbar from '@/components/Layout/Navbar.vue';
+  import { useStoreAuth } from '@/stores/storeAuth';
+  import { onMounted } from 'vue';
 
-import Navbar from '@/components/Layout/Navbar.vue';
+/*
+  store
+*/
+  const storeAuth = useStoreAuth()
+
+/*
+  mounted
+*/
+
+  onMounted(() => {
+    storeAuth.init()
+  })
 </script>
 
 <style>

@@ -1,42 +1,83 @@
 import { defineStore } from 'pinia'
+import { db } from '@/js/firebase'
+import { 
+  collection, onSnapshot, 
+  doc, setDoc, deleteDoc, updateDoc, addDoc,
+  query, orderBy 
+} from "firebase/firestore";
+
+const notesCollectionRef = collection(db, 'notes');
+const notesCollectionQuery = query(notesCollectionRef, orderBy('date', 'desc'));
 
 export const useStoreNotes = defineStore('storeNotes', {
   state: () => {
     return {
       notes: [
-        {
-          id: 'id1',
-          content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec'
-        },
-        {
-          id: 'id2',
-          content: 'This is a shorter, notes!'
-        }
-      ]
+        // {
+        //   id: 'id1',
+        //   content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime'
+        // },
+        // {
+        //   id: 'id2',
+        //   content: 'This is a shorter, notes!'
+        // }
+      ],
+      notesLoaded: false,
     }
   },
   actions: {
-    addNote(newNoteContent) {
+    async getNotes() {
+      this.notesLoaded = false
+      // const querySnapshot = await getDocs(collection(db, "notes"));
+      // querySnapshot.forEach((doc) => {
+      //   let note = {
+      //     id: doc.id,
+      //     content: doc.data().content
+      //   }
+      //   this.notes.push(note)
+      // });
+
+      onSnapshot(notesCollectionQuery, (querySnapshot) => {
+        const notes = [];
+        querySnapshot.forEach((doc) => {
+          let note = {
+            id: doc.id,
+            content: doc.data().content,
+            date: doc.data().date
+          }
+          notes.push(note)
+        });
+    
+        this.notes = notes
+        this.notesLoaded = true
+      });
+    },
+    async addNote(newNoteContent) {
       let currentDate = new Date().getTime(),
-        id = currentDate.toString()
+        date = currentDate.toString()
 
-      let note = {
-        id: id,
-        content: newNoteContent
-      }
 
-      this.notes.unshift(note)    
+      // Add a new document in collection with custom id
+      // await setDoc(doc(notesCollectionRef, id), {
+      //   id,
+      //   content: newNoteContent
+      // });
+      
+      // Add a new document in collection with unique id from firestore
+      await addDoc(notesCollectionRef, {
+        content: newNoteContent,
+        date
+      });
     },
-    deleteNote(idToDelete){
-      this.notes = this.notes.filter(note => note.id !== idToDelete)
+    async deleteNote(idToDelete) {
+      await deleteDoc(doc(notesCollectionRef, idToDelete));
     },
-    updateNote(id, content){
-      console.log('id', id)
-      console.log('content', content)
+    async updateNote(id, content) {
 
-      let index = this.notes.findIndex(note => note.id === id)
-      this.notes[index].content = content
-      console.log("index", index)
+      // Set the "capital" field of the city 'DC'
+      await updateDoc(doc(notesCollectionRef, id), {
+        content
+      });
     }
   },
   getters: {

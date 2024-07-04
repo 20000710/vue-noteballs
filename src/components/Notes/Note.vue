@@ -5,8 +5,9 @@
     <div class="card-content">
       <div class="content">
         {{ note.content }}
-        <div class="has-text-right has-text-grey-light mt-2">
-          <small>{{ characterLength }}</small>
+        <div class="columns is-mobile has-text-grey-light mt-2">
+          <small class="column">{{ dateFormatted }}</small>
+          <small class="column has-text-right">{{ characterLength }}</small>
         </div>
       </div>
     </div>
@@ -18,13 +19,18 @@
         Edit
     </RouterLink>
       <a
-        @click.prevent="storeNotes.deleteNote(note.id)"
+        @click.prevent="modals.deleteNote = true"
         href="#"
         class="card-footer-item"
       >
         Delete
       </a>
     </footer>
+    <ModalDeleteNote 
+      v-if="modals.deleteNote"
+      v-model="modals.deleteNote"
+      :noteId="note.id"
+    />
   </div>
 </template>
 
@@ -32,8 +38,10 @@
   /*
     imports
   */
-    import { computed } from 'vue';
+    import { computed, reactive } from 'vue';
+    import { useDateFormat } from '@vueuse/core';
     import { useStoreNotes } from '@/stores/storeNotes';
+    import ModalDeleteNote from './ModalDeleteNote.vue';
 
   /*
     props
@@ -51,6 +59,15 @@
     const storeNotes = useStoreNotes()
 
   /*
+    date formatted
+  */
+    const dateFormatted = computed(() => {
+      let date = new Date(parseInt(props.note.date))
+      let formattedDate = useDateFormat(date, 'MM-DD-YYYY HH:mm:ss')
+      return formattedDate.value
+    })
+
+  /*
     character length
   */
     const characterLength = computed(() => {
@@ -58,4 +75,11 @@
       let description = length > 1 ? ' characters' : 'character'
       return `${length} ${description}`
     })
+
+  /*
+    modals
+  */
+  const modals = reactive({
+    deleteNote: false 
+  })  
 </script>
