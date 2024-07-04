@@ -9,22 +9,21 @@
 /*
   imports
 */
-
   import Navbar from '@/components/Layout/Navbar.vue';
-  import { useStoreNotes } from '@/stores/storeNotes';
-import { onMounted } from 'vue';
+  import { useStoreAuth } from '@/stores/storeAuth';
+  import { onMounted } from 'vue';
 
 /*
   store
 */
-  const stoerNotes = useStoreNotes()
+  const storeAuth = useStoreAuth()
 
 /*
   mounted
 */
 
   onMounted(() => {
-    stoerNotes.getNotes()
+    storeAuth.init()
   })
 </script>
 
