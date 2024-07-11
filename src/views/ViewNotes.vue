@@ -17,7 +17,7 @@
     </AddEditNote> 
 
     <progress
-      v-if="!storeNotes.notesLoaded"
+      v-if="storeNotes.notesLoaded"
       class="progress is-medium is-info" 
       max="100" 
     />
@@ -48,7 +48,7 @@
   imports
 */
 
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import Note from '@/components/Notes/Note.vue'
 import { useStoreNotes } from '@/stores/storeNotes';
 import AddEditNote from '@/components/Notes/AddEditNote.vue';
@@ -82,12 +82,5 @@ const newNoteRef = ref(null)
   watch characters
 */
   useWatchCharacters(newNote)
-
-/*
-  mounted
-*/
-  onMounted(() => {
-    storeNotes.getNotes()
-  })
 
 </script>

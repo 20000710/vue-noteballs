@@ -1,13 +1,16 @@
 import { defineStore } from 'pinia'
 import { db } from '@/js/firebase'
+import { useStoreAuth } from '@/stores/storeAuth'
 import { 
   collection, onSnapshot, 
   doc, setDoc, deleteDoc, updateDoc, addDoc,
   query, orderBy 
 } from "firebase/firestore";
 
-const notesCollectionRef = collection(db, 'notes');
-const notesCollectionQuery = query(notesCollectionRef, orderBy('date', 'desc'));
+let notesCollectionRef
+let notesCollectionQuery;
+
+let getNotesSnapshot = null
 
 export const useStoreNotes = defineStore('storeNotes', {
   state: () => {
@@ -26,18 +29,19 @@ export const useStoreNotes = defineStore('storeNotes', {
     }
   },
   actions: {
+    init(){
+      const storeAuth = useStoreAuth()
+
+      notesCollectionRef = collection(db, 'users', storeAuth.user.id, 'notes');
+      notesCollectionQuery = query(notesCollectionRef, orderBy('date', 'desc'));
+      this.getNotes()
+    },
     async getNotes() {
       this.notesLoaded = false
-      // const querySnapshot = await getDocs(collection(db, "notes"));
-      // querySnapshot.forEach((doc) => {
-      //   let note = {
-      //     id: doc.id,
-      //     content: doc.data().content
-      //   }
-      //   this.notes.push(note)
-      // });
 
-      onSnapshot(notesCollectionQuery, (querySnapshot) => {
+      if(getNotesSnapshot) getNotesSnapshot() // unsubscribe from any active listener
+
+      getNotesSnapshot = onSnapshot(notesCollectionQuery, (querySnapshot) => {
         const notes = [];
         querySnapshot.forEach((doc) => {
           let note = {
@@ -47,10 +51,15 @@ export const useStoreNotes = defineStore('storeNotes', {
           }
           notes.push(note)
         });
-    
+        console.log("notes", notes)
         this.notes = notes
-        this.notesLoaded = true
+        if(notes.length > 0) {
+          this.notesLoaded = false
+        }
       });
+    },
+    clearNotes(){
+      this.notes = []
     },
     async addNote(newNoteContent) {
       let currentDate = new Date().getTime(),

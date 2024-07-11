@@ -74,6 +74,7 @@ import { useStoreAuth } from '@/stores/storeAuth';
   mobile nav
 */
   const showMobileNav = ref(false);
+  const navbarBurgerRef = ref(false);
 
 /*  
   click outside to close
